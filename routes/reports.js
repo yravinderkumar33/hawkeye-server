@@ -56,7 +56,6 @@ router.delete('/delete/:reportId', validateDeleteReportAPI, async (req, res) => 
     const { reportId } = _.get(req, 'params');
     try {
         const { rows, rowCount } = await db.query(`DELETE FROM ${REPORT_TABLE_NAME} WHERE reportId = $1`, [reportId]);
-        console.log(rows, rowCount);
         if (rowCount > 0) {
             const result = {
                 reportId
