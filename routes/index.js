@@ -1,5 +1,5 @@
 const reports = require('./reports');
-const { envVariables } = require('../helpers/envHelpers');
+const { envVariables } = require('../helpers');
 const bodyParser = require('body-parser')
 
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const mountRoutes = require('./routes');
 const app = express();
-const { envVariables } = require('./helpers/envHelpers');
+const { envVariables } = require('./helpers');
 
 mountRoutes(app);
 

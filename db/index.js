@@ -1,5 +1,5 @@
 const { Pool } = require('pg')
-const { envVariables } = require('../helpers/envHelpers');
+const { envVariables } = require('../helpers');
 
 const pool = new Pool({
   host: envVariables.DB.HOST,

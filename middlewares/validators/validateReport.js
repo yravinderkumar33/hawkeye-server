@@ -1,6 +1,9 @@
 const Joi = require("@hapi/joi");
-const { sendApiResponse } = require('../../helpers/apiResponse');
+const { sendApiResponse, constants } = require('../../helpers');
 const _ = require('lodash');
+
+
+const getBadRequestResponse = ({ id, error }) => sendApiResponse({ id, responseCode: constants.RESPONSE_CODE.CLIENT_ERROR, params: { status: constants.STATUS.FAILED, errmsg: error.details.map(d => d.message), err: constants.RESPONSE_CODE.BAD_REQUEST } });
 
 const reportRequestValidator = {
     validateCreateReportAPI(req, res, next) {
@@ -31,7 +34,7 @@ const reportRequestValidator = {
         });
         const { error, value } = schema.validate(_.get(req, 'body'));
         if (error) {
-            res.status(400).send(sendApiResponse({ id, responseCode: 'CLIENT_ERROR', params: { status: 'failed', errmsg: error.details.map(d => d.message), err: 'BAD_REQUEST' } }));
+            res.status(400).send(getBadRequestResponse({ id, error }));
         }
         else {
             next();
@@ -44,7 +47,7 @@ const reportRequestValidator = {
         });
         const { error, value } = schema.validate(_.get(req.params));
         if (error) {
-            res.status(400).send(sendApiResponse({ id, responseCode: 'CLIENT_ERROR', params: { status: 'failed', errmsg: error.details.map(d => d.message), err: 'BAD_REQUEST' } }));
+            res.status(400).send(getBadRequestResponse({ id, error }));
         }
         else {
             next();
@@ -78,7 +81,7 @@ const reportRequestValidator = {
 
         const { error } = schema.validate(_.get(req, 'body'));
         if (error) {
-            res.status(400).send(sendApiResponse({ id, responseCode: 'CLIENT_ERROR', params: { status: 'failed', errmsg: error.details.map(d => d.message), err: 'BAD_REQUEST' } }));
+            res.status(400).send(getBadRequestResponse({ id, error }));
         }
         else {
             next();
@@ -91,7 +94,7 @@ const reportRequestValidator = {
         });
         const { error, value } = schema.validate(_.get(req.params));
         if (error) {
-            res.status(400).send(sendApiResponse({ id, responseCode: 'CLIENT_ERROR', params: { status: 'failed', errmsg: error.details.map(d => d.message), err: 'BAD_REQUEST' } }));
+            res.status(400).send(getBadRequestResponse({ id, error }));
         }
         else {
             next();
@@ -110,7 +113,7 @@ const reportRequestValidator = {
         });
         const { error, value } = schema.validate(_.get(req, 'body'));
         if (error) {
-            res.status(400).send(sendApiResponse({ id, responseCode: 'CLIENT_ERROR', params: { status: 'failed', errmsg: error.details.map(d => d.message), err: 'BAD_REQUEST' } }));
+            res.status(400).send(getBadRequestResponse({ id, error }));
         }
         else {
             next();

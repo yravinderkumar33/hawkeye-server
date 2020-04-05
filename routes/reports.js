@@ -2,16 +2,13 @@ const Router = require('express-promise-router');
 const db = require('../db');
 const router = new Router();
 const _ = require('lodash');
-const { envVariables } = require('../helpers/envHelpers');
-const { sendApiResponse } = require('../helpers/apiResponse');
+const { envVariables, sendApiResponse, constants } = require('../helpers');
 const { v4 } = require('uuid');
 const dateFormat = require('dateformat');
 
 const REPORT_TABLE_NAME = _.get(envVariables, 'TABLE_NAME');
-const SUCCESS_RESPONSE_CODE = 'OK';
-const FAILED_RESPONSE_CODE = 'SERVER_ERROR';
 
-const { validateCreateReportAPI, validateReadReportAPI, validateDeleteReportAPI, validateListReportAPI, validateUpdateReportAPI } = require('../middlewares/validators/validateReport');
+const { validateCreateReportAPI, validateReadReportAPI, validateDeleteReportAPI, validateListReportAPI, validateUpdateReportAPI } = require('../middlewares');
 
 module.exports = router;
 
@@ -25,12 +22,12 @@ router.get('/get/:reportId', validateReadReportAPI, async (req, res) => {
                 reports: rows,
                 count: rowCount
             }
-            res.status(200).send(sendApiResponse({ id, responseCode: SUCCESS_RESPONSE_CODE, result, params: {} }));
+            res.status(200).send(sendApiResponse({ id, responseCode: constants.RESPONSE_CODE.SUCCESS, result, params: {} }));
         } else {
-            res.status(404).send(sendApiResponse({ id, responseCode: FAILED_RESPONSE_CODE, params: { status: 'failed', errmsg: 'no report found' } }));
+            res.status(404).send(sendApiResponse({ id, responseCode: constants.RESPONSE_CODE.SERVER_ERROR, params: { status: constants.STATUS.FAILED, errmsg: constants.MESSAGES.NO_REPORT } }));
         }
     } catch (err) {
-        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: 'failed', errmsg: _.get(err, 'message') }, responseCode: FAILED_RESPONSE_CODE }))
+        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: constants.STATUS.FAILED, errmsg: _.get(err, 'message') }, responseCode: constants.RESPONSE_CODE.SERVER_ERROR }))
     }
 });
 
@@ -47,9 +44,9 @@ router.post('/create', validateCreateReportAPI, async (req, res) => {
         const result = {
             reportId: reportid
         }
-        res.status(200).send(sendApiResponse({ id, responseCode: SUCCESS_RESPONSE_CODE, result, params: {} }));
+        res.status(200).send(sendApiResponse({ id, responseCode: constants.RESPONSE_CODE.SUCCESS, result, params: {} }));
     } catch (err) {
-        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: 'failed', errmsg: _.get(err, 'message') }, responseCode: FAILED_RESPONSE_CODE }));
+        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: constants.STATUS.FAILED, errmsg: _.get(err, 'message') }, responseCode: constants.RESPONSE_CODE.SERVER_ERROR }));
     }
 });
 
@@ -64,12 +61,12 @@ router.delete('/delete/:reportId', validateDeleteReportAPI, async (req, res) => 
             const result = {
                 reportId
             }
-            res.status(200).send(sendApiResponse({ id, responseCode: SUCCESS_RESPONSE_CODE, result, params: {} }));
+            res.status(200).send(sendApiResponse({ id, responseCode: constants.RESPONSE_CODE.SUCCESS, result, params: {} }));
         } else {
-            res.status(404).send(sendApiResponse({ id, responseCode: FAILED_RESPONSE_CODE, params: { status: 'failed', errmsg: 'no report found' } }));
+            res.status(404).send(sendApiResponse({ id, responseCode: constants.RESPONSE_CODE.SERVER_ERROR, params: { status: constants.STATUS.FAILED, errmsg: constants.MESSAGES.NO_REPORT } }));
         }
     } catch (err) {
-        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: 'failed', errmsg: _.get(err, 'message') }, responseCode: FAILED_RESPONSE_CODE }))
+        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: constants.STATUS.FAILED, errmsg: _.get(err, 'message') }, responseCode: constants.RESPONSE_CODE.SERVER_ERROR }))
     }
 });
 
@@ -88,15 +85,15 @@ router.patch('/update/:reportId', validateUpdateReportAPI, async (req, res) => {
                 const result = {
                     reportId
                 }
-                res.status(200).send(sendApiResponse({ id, responseCode: SUCCESS_RESPONSE_CODE, result, params: {} }));
+                res.status(200).send(sendApiResponse({ id, responseCode: constants.RESPONSE_CODE.SUCCESS, result, params: {} }));
             } else {
-                res.status(404).send(sendApiResponse({ id, responseCode: FAILED_RESPONSE_CODE, params: { status: 'failed', errmsg: 'no report found' } }));
+                res.status(404).send(sendApiResponse({ id, responseCode: constants.RESPONSE_CODE.SERVER_ERROR, params: { status: constants.STATUS.FAILED, errmsg: constants.MESSAGES.NO_REPORT } }));
             }
         } else {
-            res.status(400).send(sendApiResponse({ id, responseCode: 'CLIENT_ERROR', params: { status: 'failed', errmsg: 'no columns to update' } }));
+            res.status(400).send(sendApiResponse({ id, responseCode: 'CLIENT_ERROR', params: { status: constants.STATUS.FAILED, errmsg: constants.MESSAGES.NO_COLUMNS_TO_UPDATE } }));
         }
     } catch (err) {
-        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: 'failed', errmsg: _.get(err, 'message') }, responseCode: FAILED_RESPONSE_CODE }));
+        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: constants.STATUS.FAILED, errmsg: _.get(err, 'message') }, responseCode: constants.RESPONSE_CODE.SERVER_ERROR }));
     }
 });
 
@@ -107,15 +104,14 @@ router.post('/list', validateListReportAPI, async (req, res) => {
     const whereClause = _.keys(filters).length ? `WHERE ${_.join(_.map(filters, (value, key) => `${key} IN (${_.join(_.map(value, val => `'${val}'`), ', ')})`), ' AND ')}` : '';
     try {
         const query = `SELECT * FROM ${REPORT_TABLE_NAME} ${whereClause}`;
-        console.log(query);
         const { rows, rowCount } = await db.query(query);
         const result = {
             reports: rows,
             count: rowCount
         };
-        res.status(200).send(sendApiResponse({ id, responseCode: SUCCESS_RESPONSE_CODE, result, params: {} }));
+        res.status(200).send(sendApiResponse({ id, responseCode: constants.RESPONSE_CODE.SUCCESS, result, params: {} }));
     } catch (err) {
-        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: 'failed', errmsg: _.get(err, 'message') }, responseCode: FAILED_RESPONSE_CODE }));
+        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: constants.STATUS.FAILED, errmsg: _.get(err, 'message') }, responseCode: constants.RESPONSE_CODE.SERVER_ERROR }));
     }
 });
 
