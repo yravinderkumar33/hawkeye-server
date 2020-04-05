@@ -7,15 +7,15 @@ const packageObj = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
 const envVariables = {
     DB: {
-        HOST: process.env.host || 'localhost',
-        NAME: process.env.name || 'new2',
-        PASSWORD: process.env.password || '',
-        PORT: process.env.port || 5432
+        HOST: env.DB_HOST || 'localhost',
+        NAME: env.DB_NAME || 'new2',
+        PASSWORD: env.DB_PASSWORD || '',
+        PORT: env.DB_PORT || 5432
     },
-    SERVER_PORT: get(env, 'sunbird_port') || get(process, 'env.PORT') || 3000,
-    BASE_REPORT_URL: process.sunbird_base_report_url || 'report',
-    TABLE_NAME: process.env.table_name || 'report',
-    ENV: process.env.env || 'https://dev.sunbirded.org'
+    SERVER_PORT: get(env, 'SUNBIRD_SERVER_PORT') || get(process, 'env.PORT') || 3000,
+    BASE_REPORT_URL: process.SUNBIRD_BASE_REPORT_URL || 'report',
+    TABLE_NAME: process.env.TABLE_NAME || 'report',
+    ENV: process.env.ENV || 'https://dev.sunbirded.org'
 }
 
 module.exports = { envVariables, packageObj };

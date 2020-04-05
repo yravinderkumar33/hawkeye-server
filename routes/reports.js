@@ -5,6 +5,7 @@ const _ = require('lodash');
 const { envVariables } = require('../helpers/envHelpers');
 const { sendApiResponse } = require('../helpers/apiResponse');
 const { v4 } = require('uuid');
+const dateFormat = require('dateformat');
 
 const REPORT_TABLE_NAME = _.get(envVariables, 'TABLE_NAME');
 const SUCCESS_RESPONSE_CODE = 'OK';
@@ -76,19 +77,26 @@ router.delete('/delete/:reportId', validateDeleteReportAPI, async (req, res) => 
 router.patch('/update/:reportId', validateUpdateReportAPI, async (req, res) => {
     const id = _.get(req, 'id') || "api.report.update";
     const { reportId } = _.get(req, 'params');
+    const reqBody = _.get(req, 'body.request.report');
     try {
-        const query = `UPDATE ${REPORT_TABLE_NAME} SET title = 'hey new title' WHERE reportid = $1`
-        const { rows, rowCount } = await db.query(query, [reportId]);
-
-        res.send({
-            reportId,
-            rowCount,
-            rows
-        })
-
+        if (_.keys(reqBody).length) {
+            const updatedon = dateFormat(new Date());
+            const body = { ...reqBody, updatedon };
+            const query = `UPDATE ${REPORT_TABLE_NAME} SET ${_.join(_.map(body, (value, key) => `${key} = '${value}'`), ', ')} WHERE reportid = $1`
+            const { rows, rowCount } = await db.query(query, [reportId]);
+            if (rowCount > 0) {
+                const result = {
+                    reportId
+                }
+                res.status(200).send(sendApiResponse({ id, responseCode: SUCCESS_RESPONSE_CODE, result, params: {} }));
+            } else {
+                res.status(404).send(sendApiResponse({ id, responseCode: FAILED_RESPONSE_CODE, params: { status: 'failed', errmsg: 'no report found' } }));
+            }
+        } else {
+            res.status(400).send(sendApiResponse({ id, responseCode: 'CLIENT_ERROR', params: { status: 'failed', errmsg: 'no columns to update' } }));
+        }
     } catch (err) {
-        console.log(err);
-        res.send({ err });
+        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: 'failed', errmsg: _.get(err, 'message') }, responseCode: FAILED_RESPONSE_CODE }));
     }
 });
 
@@ -107,7 +115,7 @@ router.post('/list', validateListReportAPI, async (req, res) => {
         };
         res.status(200).send(sendApiResponse({ id, responseCode: SUCCESS_RESPONSE_CODE, result, params: {} }));
     } catch (err) {
-        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: 'failed', errmsg: _.get(err, 'message') }, responseCode: FAILED_RESPONSE_CODE }))
+        res.status(500).send(sendApiResponse({ id, params: { err: JSON.stringify(err), status: 'failed', errmsg: _.get(err, 'message') }, responseCode: FAILED_RESPONSE_CODE }));
     }
 });
 
