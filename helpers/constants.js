@@ -12,7 +12,8 @@ module.exports = {
     },
     MESSAGES: {
         NO_REPORT: 'no report found',
-        NO_COLUMNS_TO_UPDATE: 'no columns to update'
+        NO_COLUMNS_TO_UPDATE: 'no columns to update',
+        NO_API: "no api exists with these value"
     }
 
 }
