@@ -10,7 +10,8 @@ const envVariables = {
         HOST: env.DB_HOST || 'localhost',
         NAME: env.DB_NAME || 'new2',
         PASSWORD: env.DB_PASSWORD || '',
-        PORT: env.DB_PORT || 5432
+        PORT: env.DB_PORT || 5432,
+        USER: env.DB_USER
     },
     SERVER_PORT: get(env, 'SUNBIRD_SERVER_PORT') || get(process, 'env.PORT') || 3000,
     BASE_REPORT_URL: process.SUNBIRD_BASE_REPORT_URL || 'report',
