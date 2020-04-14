@@ -7,7 +7,7 @@ const getBadRequestResponse = ({ id, error }) => sendApiResponse({ id, responseC
 
 const reportRequestValidator = {
     validateCreateReportAPI(req, res, next) {
-        const id = req.id = "api.report.create";
+        const id = (req.id = "api.report.create");
         const schema = Joi.object({
             request: Joi.object({
                 report: Joi.object({
@@ -20,41 +20,44 @@ const reportRequestValidator = {
                     createdon: Joi.string().optional(),
                     updatedon: Joi.string().optional(),
                     createdby: Joi.string().required(),
-                    type: Joi.string().valid('private', 'public').required(),
-                    status: Joi.string().valid('live', 'draft', 'retired').trim().optional(),
+                    type: Joi.string().valid("private", "public").required(),
+                    status: Joi.string()
+                        .valid("draft")
+                        .trim()
+                        .optional(),
                     slug: Joi.string().trim().required(),
                     templateurl: Joi.string().optional(),
+                    tags: Joi.array().items(Joi.string()).required(),
+                    updatefrequency: Joi.string().required(),
                     reportgenerateddate: Joi.string().required(),
                     reportduration: Joi.object({
                         startdate: Joi.string().required(),
-                        enddate: Joi.string().required()
-                    }).required()
-                }).required()
-            }).required()
+                        enddate: Joi.string().required(),
+                    }).required(),
+                }).required(),
+            }).required(),
         });
-        const { error, value } = schema.validate(_.get(req, 'body'));
+        const { error, value } = schema.validate(_.get(req, "body"));
         if (error) {
             res.status(400).send(getBadRequestResponse({ id, error }));
-        }
-        else {
+        } else {
             next();
         }
     },
     validateReadReportAPI(req, res, next) {
-        const id = req.id = "api.report.read";
+        const id = (req.id = "api.report.read");
         const schema = Joi.object({
-            reportId: Joi.string().required()
+            reportId: Joi.string().required(),
         });
         const { error, value } = schema.validate(_.get(req.params));
         if (error) {
             res.status(400).send(getBadRequestResponse({ id, error }));
-        }
-        else {
+        } else {
             next();
         }
     },
     validateUpdateReportAPI(req, res, next) {
-        const id = req.id = "api.report.update";
+        const id = (req.id = "api.report.update");
         const schema = Joi.object({
             request: Joi.object({
                 report: Joi.object({
@@ -66,59 +69,64 @@ const reportRequestValidator = {
                     createdon: Joi.string().optional(),
                     updatedon: Joi.string().optional(),
                     createdby: Joi.string().optional(),
-                    type: Joi.string().valid('private', 'public').optional(),
-                    status: Joi.string().valid('live', 'draft', 'retired').trim().optional(),
+                    type: Joi.string().valid("private", "public").optional(),
+                    status: Joi.string()
+                        .valid("live", "draft", "retired")
+                        .trim()
+                        .optional(),
                     slug: Joi.string().trim().optional(),
                     templateurl: Joi.string().optional(),
+                    tags: Joi.array().items(Joi.string()).optional(),
+                    updatefrequency: Joi.string().optional(),
                     reportgenerateddate: Joi.string().optional(),
                     reportduration: Joi.object({
                         startdate: Joi.string().required(),
-                        enddate: Joi.string().required()
-                    }).optional()
-                }).required()
-            }).required()
-        })
-
-        const { error } = schema.validate(_.get(req, 'body'));
+                        enddate: Joi.string().required(),
+                    }).optional(),
+                }).required(),
+            }).required(),
+        });
+        const { error } = schema.validate(_.get(req, "body"));
         if (error) {
             res.status(400).send(getBadRequestResponse({ id, error }));
-        }
-        else {
+        } else {
             next();
         }
     },
     validateDeleteReportAPI(req, res, next) {
-        const id = req.id = "api.report.delete";
+        const id = (req.id = "api.report.delete");
         const schema = Joi.object({
-            reportId: Joi.string().required()
+            reportId: Joi.string().required(),
         });
         const { error, value } = schema.validate(_.get(req.params));
         if (error) {
             res.status(400).send(getBadRequestResponse({ id, error }));
-        }
-        else {
+        } else {
             next();
         }
     },
     validateListReportAPI(req, res, next) {
-        const id = req.id = "api.report.list";
+        const id = (req.id = "api.report.list");
         const schema = Joi.object({
             request: Joi.object({
                 filters: Joi.object({
                     slug: Joi.array().items(Joi.string()).optional(),
-                    type: Joi.array().items(Joi.string().valid('public', 'private')).optional(),
-                    status: Joi.array().items(Joi.string().valid('live', 'retired', 'draft')).optional()
-                }).required()
-            }).required()
+                    type: Joi.array()
+                        .items(Joi.string().valid("public", "private"))
+                        .optional(),
+                    status: Joi.array()
+                        .items(Joi.string().valid("live", "retired", "draft"))
+                        .optional(),
+                }).required(),
+            }).required(),
         });
-        const { error, value } = schema.validate(_.get(req, 'body'));
+        const { error, value } = schema.validate(_.get(req, "body"));
         if (error) {
             res.status(400).send(getBadRequestResponse({ id, error }));
-        }
-        else {
+        } else {
             next();
         }
-    }
-}
+    },
+};
 
 module.exports = reportRequestValidator;

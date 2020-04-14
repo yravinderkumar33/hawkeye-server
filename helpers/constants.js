@@ -15,5 +15,4 @@ module.exports = {
         NO_COLUMNS_TO_UPDATE: 'no columns to update',
         NO_API: "no api exists with these value"
     }
-
 }
